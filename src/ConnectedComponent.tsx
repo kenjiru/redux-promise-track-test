@@ -46,6 +46,12 @@ interface IConnectedComponentState {
 function mapStateToProps(state: IStore, ownProps: IConnectedComponentProps): IConnectedComponentProps {
     let loadingState: ILoadingState = getLoadingState(state, GET_DATA);
 
+    if (loadingState.isLoading) {
+        return _.merge({}, ownProps, {
+            loadingState
+        });
+    }
+
     return _.merge({}, ownProps, {
         foo: state.data.foo,
         bar: state.data.bar,
@@ -53,10 +59,4 @@ function mapStateToProps(state: IStore, ownProps: IConnectedComponentProps): ICo
     });
 }
 
-function mergeProps(state: IConnectedComponentProps, dispatchProps: IConnectedComponentProps, ownProps: IConnectedComponentProps): IConnectedComponentProps {
-    console.log("mergeProps", state, dispatchProps, ownProps);
-
-    return _.merge({}, ownProps, state, dispatchProps);
-}
-
-export default connect(mapStateToProps, null, mergeProps)(ConnectedComponent);
+export default connect(mapStateToProps)(ConnectedComponent);
