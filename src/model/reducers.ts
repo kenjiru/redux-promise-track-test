@@ -17,7 +17,7 @@ const defaultStore: IData = {
     bar: "default store bar"
 };
 
-function dataReducer(store: IData = defaultStore, action: IAction): IData {
+function dataReducer(store: IData = {}, action: IAction): IData {
     switch (action.type) {
         case GET_FOO:
             return _.assign({}, store, {

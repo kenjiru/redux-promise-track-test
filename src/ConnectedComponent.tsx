@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from 'react';
 import {connect} from "react-redux";
 
@@ -41,12 +42,12 @@ interface IConnectedComponentProps {
 interface IConnectedComponentState {
 }
 
-export default connect((state: IStore): IConnectedComponentProps => {
-    console.log("connect");
+export default connect((state: IStore, ownProps: IConnectedComponentProps): IConnectedComponentProps => {
+    let loadingState: ILoadingState = getLoadingState(state, GET_DATA);
 
-    return {
+    return _.merge({}, ownProps, {
         foo: state.data.foo,
         bar: state.data.bar,
-        loadingState: getLoadingState(state, GET_DATA)
-    }
+        loadingState
+    });
 })(ConnectedComponent);
