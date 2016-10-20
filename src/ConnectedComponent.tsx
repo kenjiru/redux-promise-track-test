@@ -6,12 +6,13 @@ import {IStore} from "./model/store";
 import {GET_DATA} from "./model/actions";
 import {ILoadingState} from "redux-promise-track";
 import {getLoadingState} from "redux-promise-track";
+import {IDispatchFunction} from "./util/ActionUtil";
 
 class ConnectedComponent extends React.Component<IConnectedComponentProps, IConnectedComponentState> {
-    public componentWillReceiveProps(nextProps: IConnectedComponentProps) {
-        console.log("ConnectedComponent.componentWillReceiveProps");
-        console.log(nextProps);
-    }
+    // public componentWillReceiveProps(nextProps: IConnectedComponentProps) {
+    //     console.log("ConnectedComponent.componentWillReceiveProps");
+    //     console.log(nextProps);
+    // }
 
     render() {
         return (
@@ -25,7 +26,7 @@ class ConnectedComponent extends React.Component<IConnectedComponentProps, IConn
     }
 
     private renderLoading(): React.ReactElement<any> {
-        if (this.props.loadingState.isLoading) {
+        if (this.props.loadingState && this.props.loadingState.isLoading) {
             return (
                 <div>Loading...</div>
             );
@@ -42,7 +43,7 @@ interface IConnectedComponentProps {
 interface IConnectedComponentState {
 }
 
-export default connect((state: IStore, ownProps: IConnectedComponentProps): IConnectedComponentProps => {
+function mapStateToProps(state: IStore, ownProps: IConnectedComponentProps): IConnectedComponentProps {
     let loadingState: ILoadingState = getLoadingState(state, GET_DATA);
 
     return _.merge({}, ownProps, {
@@ -50,4 +51,12 @@ export default connect((state: IStore, ownProps: IConnectedComponentProps): ICon
         bar: state.data.bar,
         loadingState
     });
-})(ConnectedComponent);
+}
+
+function mergeProps(state: IConnectedComponentProps, dispatchProps: IConnectedComponentProps, ownProps: IConnectedComponentProps): IConnectedComponentProps {
+    console.log("mergeProps", state, dispatchProps, ownProps);
+
+    return _.merge({}, ownProps, state, dispatchProps);
+}
+
+export default connect(mapStateToProps, null, mergeProps)(ConnectedComponent);
