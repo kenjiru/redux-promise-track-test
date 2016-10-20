@@ -6,21 +6,10 @@ export function getData(): IActionCallback {
         return dispatch(createAction(GET_DATA, Promise.all([
                 dispatch(getFoo()),
                 dispatch(getBar())
-            ]).then(() => {
-                console.log("promise all executed!");
-            })
+            ])
         ));
     };
 }
-/*
-
-Promise.all([
-    dispatch(getFoo()),
-    dispatch(getBar())
-]).then(() => {
-    console.log("promise all executed!");
-})
-*/
 
 export const GET_FOO: string = "GET_FOO";
 export function getFoo(): IActionCallback {
