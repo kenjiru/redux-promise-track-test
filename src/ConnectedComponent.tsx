@@ -37,9 +37,9 @@ interface IConnectedComponentProps {
 interface IConnectedComponentState {
 }
 
-function mapStateToProps<T>(mapState: (state: IStore) => T,
-                            mapLoadingState: (state: IStore) => ILoadingStateMap): (state: IStore, ownProps: T) => T {
-    return (state: IStore, ownProps: T): T => {
+function mapStateToProps<S,T>(mapState: (state: S) => T,
+                              mapLoadingState: (state: S) => ILoadingStateMap): (state: S, ownProps: T) => T {
+    return (state: S, ownProps: T): T => {
         let loadingStates: ILoadingStateMap = mapLoadingState(state);
 
         if (isLoading(loadingStates)) {
@@ -54,11 +54,11 @@ function isLoading(loadingStates: ILoadingStateMap): boolean {
     return _.some(loadingStates, (loadingState: ILoadingState) => loadingState.isLoading);
 }
 
-interface ILoadingStateMap {
+export interface ILoadingStateMap {
     [key: string]: ILoadingState
 }
 
-export default connect(mapStateToProps<IConnectedComponentProps>(
+export default connect(mapStateToProps<IStore, IConnectedComponentProps>(
     (state: IStore): IConnectedComponentProps => ({
             foo: state.data.foo,
             bar: state.data.bar
