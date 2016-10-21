@@ -6,14 +6,8 @@ import {IStore} from "./model/store";
 import {GET_DATA} from "./model/actions";
 import {ILoadingState} from "redux-promise-track";
 import {getLoadingState} from "redux-promise-track";
-import {IDispatchFunction} from "./util/ActionUtil";
 
 class ConnectedComponent extends React.Component<IConnectedComponentProps, IConnectedComponentState> {
-    // public componentWillReceiveProps(nextProps: IConnectedComponentProps) {
-    //     console.log("ConnectedComponent.componentWillReceiveProps");
-    //     console.log(nextProps);
-    // }
-
     render() {
         return (
             <div className="connected-component">
@@ -43,20 +37,33 @@ interface IConnectedComponentProps {
 interface IConnectedComponentState {
 }
 
-function mapStateToProps(state: IStore, ownProps: IConnectedComponentProps): IConnectedComponentProps {
-    let loadingState: ILoadingState = getLoadingState(state, GET_DATA);
+function mapStateToProps<T>(mapState: (state: IStore) => T,
+                            mapLoadingState: (state: IStore) => ILoadingStateMap): (state: IStore, ownProps: T) => T {
+    return (state: IStore, ownProps: T): T => {
+        let loadingStates: ILoadingStateMap = mapLoadingState(state);
 
-    if (loadingState.isLoading) {
-        return _.merge({}, ownProps, {
-            loadingState
-        });
+        if (isLoading(loadingStates)) {
+            return _.merge({}, ownProps, loadingStates);
+        }
+
+        return _.merge({}, ownProps, mapState(state), loadingStates);
     }
-
-    return _.merge({}, ownProps, {
-        foo: state.data.foo,
-        bar: state.data.bar,
-        loadingState
-    });
 }
 
-export default connect(mapStateToProps)(ConnectedComponent);
+function isLoading(loadingStates: ILoadingStateMap): boolean {
+    return _.some(loadingStates, (loadingState: ILoadingState) => loadingState.isLoading);
+}
+
+interface ILoadingStateMap {
+    [key: string]: ILoadingState
+}
+
+export default connect(mapStateToProps<IConnectedComponentProps>(
+    (state: IStore): IConnectedComponentProps => ({
+            foo: state.data.foo,
+            bar: state.data.bar
+    }),
+    (state: IStore): ILoadingStateMap => ({
+            loadingState: getLoadingState(state, GET_DATA)
+    })
+))(ConnectedComponent);
